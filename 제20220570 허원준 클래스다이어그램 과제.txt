@@ -1,0 +1,56 @@
+1단계. 시스템의 핵심 도메인 파악
+
+쇼핑몰은 기본적으로 **고객(Customer)**, **상품(Product)**, **주문(Order)**, **결제(Payment)**, **배송(Delivery)**으로 이루어집니다.
+또한 관리자는 **상품/주문 관리** 기능을 수행합니다.
+
+---
+ 2단계. 클래스 구성 (설계 개념 중심)
+
+| 클래스           | 주요 속성                                              | 주요 메서드                                       | 관계 요약                                          |
+| ------------- | -------------------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| **Customer**  | customerId, name, email, password, phone           | register(), login(), browseProduct()         | 1:N → Order                                    |
+| **Admin**     | adminId, name, email                               | addProduct(), updateProduct(), manageOrder() | 관리 기능 중심                                       |
+| **Product**   | productId, name, price, stock, description, status | updateStock(), applyDiscount()               | N:M → Category, 1:N → Review                   |
+| **Category**  | categoryId, name, description                      | addProduct(), removeProduct()                | N:M → Product                                  |
+| **Review**    | reviewId, rating, comment, date                    | edit(), delete()                             | 1:1 → Customer, 1:1 → Product                  |
+| **Cart**      | cartId, createdAt                                  | addItem(), removeItem(), checkout()          | 1:1 → Customer, 1:N → CartItem                 |
+| **CartItem**  | quantity, subTotal                                 | updateQuantity()                             | 1:1 → Product                                  |
+| **Order**     | orderId, orderDate, status, totalPrice             | addItem(), cancelOrder(), confirmPayment()   | 1:N → OrderItem, 1:1 → Payment, 1:1 → Delivery |
+| **OrderItem** | quantity, unitPrice                                | calculateSubTotal()                          | 1:1 → Product                                  |
+| **Payment**   | paymentId, method, amount, status                  | processPayment(), refund()                   | 1:1 → Order                                    |
+| **Delivery**  | deliveryId, address, deliveryDate, status          | updateStatus(), track()                      | 1:1 → Order                                    |
+
+---
+
+3단계. 관계 다이어그램 구조 (텍스트 표현)
+
+```
+Customer ───< Order >─── OrderItem >─── Product >──< Category
+    │                        │
+    │                        ▼
+    ▼                      Payment
+   Cart >── CartItem          │
+     │                       ▼
+     └──────────────→ Delivery
+
+Product >──< Review >── Customer
+Admin ── 관리 ──> Product, Order
+```
+
+---
+
+4단계. Visual Paradigm 제작 가이드
+
+1. Visual Paradigm 실행 → **New Project → Class Diagram**
+2. 위 클래스들을 각각 생성하고 속성과 메서드를 입력
+3. 관계선(Association, Aggregation, Composition, Inheritance)으로 연결
+
+   * 예: `Customer` → `Order` : 1:N (일반 Association)
+   * `Order` → `Payment` : 1:1 (Composition)
+   * `Product` ↔ `Category` : N:M (Association Class로 표현 가능)
+4. 스타일 팁
+
+   * Customer/Order/Payment는 **User Flow** 색상 (파란 계열)
+   * Product/Category/Review는 **Catalog Flow** 색상 (초록 계열)
+5. **Export as Image** → PNG로 저장
+
