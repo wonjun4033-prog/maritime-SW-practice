@@ -1,0 +1,156 @@
+20220570 허원준 해양SW설계실습 7번째 과제
+
+1) Class Diagram (최종 정리본)
+
+클래스 목록 & 속성/메서드 정의
+1. Equipment (안전장비)
+Attributes
+equipmentId : String
+name : String
+type : String
+location : String
+status : String (정상/점검필요/교체필요)
+expiryDate : Date
+inspectionCycle : int
+Methods
+updateInfo()
+updateStatus()
+checkExpiry()
+
+2. Inspection (점검)
+Attributes
+inspectionId : String
+equipmentId : String
+date : Date
+result : String
+inspector : String
+Methods
+addInspection()
+getInspectionHistory()
+
+3. Alert (알림)
+Attributes
+alertId : String
+equipmentId : String
+type : String (점검, 유효기간, 등)
+message : String
+date : Date
+Methods
+sendAlert()
+
+4. User (사용자, 추상 클래스)
+Attributes
+userId : String
+name : String
+role : String
+Methods
+login()
+viewEquipment()
+
+5. Manager (관리자) — User 상속
+Methods
+registerEquipment()
+editEquipment()
+deleteEquipment()
+registerInspection()
+changeStatus()
+checkAlerts()
+
+6. Crew (선원) — User 상속
+Methods
+viewEquipment() (override)
+
+7. SafetyManager (안전책임자) — User 상속
+Methods
+viewInspectionHistory()
+
+클래스 간 관계
+
+Manager – Equipment : 관리 (association)
+
+Equipment – Inspection : 1:N
+
+Equipment – Alert : 1:N
+
+User – Manager/Crew/SafetyManager : Generalization
+
+Manager – Inspection : 점검등록 association
+
+SafetyManager – Inspection : 이력조회 association
+
+Crew – Equipment : 조회 association
+
+Visual Paradigm에서 그대로 입력하면 다음 형태가 됨
+User <|-- Manager
+User <|-- Crew
+User <|-- SafetyManager
+Equipment 1 --- * Inspection
+Equipment 1 --- * Alert
+Manager --- Equipment
+Manager --- Inspection
+SafetyManager --- Inspection
+Crew --- Equipment
+
+2) Sequence Diagram
+
+장비 점검 등록(Inspection 등록) 프로세스로 대표 시퀀스를 구성함.
+
+등장 객체 (Lifeline)
+
+Manager
+Equipment System (System)
+Equipment
+Inspection
+Alert
+
+시퀀스 메시지 흐름 
+① Manager → System
+selectEquipment(equipmentId)
+장비를 선택하며 점검을 시작함.
+
+② System → Equipment
+getEquipmentInfo()
+장비 상세 정보 요청.
+
+③ Equipment → System
+return equipmentInfo
+
+④ Manager → System
+registerInspection(result, date)
+점검 내용 입력.
+
+⑤ System → Inspection
+createInspectionRecord()
+점검 기록 객체 생성.
+
+⑥ Inspection → System
+return inspectionId
+
+⑦ System → Equipment
+updateStatus(result)
+
+⑧ Equipment → System
+return statusUpdated
+
+⑨ System → Alert (조건부)
+sendAlertIfNeeded(equipmentId, status)
+점검필요/교체필요 상태면 알림 생성.
+
+⑩ Alert → System
+alertCreated()
+
+⑪ System → Manager
+displayCompletionMessage()
+
+시퀀스 다이어그램 텍스트 형태 요약
+Manager → System : selectEquipment()
+System → Equipment : getEquipmentInfo()
+Equipment → System : equipmentInfo
+Manager → System : registerInspection(result)
+System → Inspection : createInspectionRecord()
+Inspection → System : inspectionId
+System → Equipment : updateStatus(result)
+Equipment → System : statusUpdated
+System → Alert : sendAlertIfNeeded()
+Alert → System : alertCreated
+System → Manager : displayCompletionMessage()
